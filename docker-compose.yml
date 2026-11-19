@@ -1,0 +1,28 @@
+services:
+  primary:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: lab
+      POSTGRES_DB: lab
+    command: >
+      postgres -c wal_level=replica -c max_wal_senders=5 -c max_replication_slots=5
+      -c hot_standby=on -c track_io_timing=on -c log_lock_waits=on -c deadlock_timeout=500ms
+    ports: ["55432:5432"]
+    volumes:
+      - ./scripts/primary-init.sh:/docker-entrypoint-initdb.d/10-replication.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lab"]
+      interval: 2s
+      retries: 30
+  replica:
+    image: postgres:16
+    entrypoint: ["/bin/bash", "/scripts/replica-entrypoint.sh"]
+    depends_on:
+      primary: {condition: service_healthy}
+    ports: ["55433:5432"]
+    volumes:
+      - ./scripts:/scripts:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lab"]
+      interval: 2s
+      retries: 30

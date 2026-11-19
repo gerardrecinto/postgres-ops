@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>postgres-ops-lab</title>
+<style>
+:root{--bg:#fff;--fg:#1b1f24;--mut:#57606a;--line:#d0d7de;--code:#f6f8fa;--link:#0b5cad}
+@media (prefers-color-scheme:dark){:root{--bg:#0d1117;--fg:#e6edf3;--mut:#9da7b3;--line:#30363d;--code:#161b22;--link:#58a6ff}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px}
+a{color:var(--link)} h1{margin:0 0 4px} p.sub{color:var(--mut);margin-top:0}
+pre{background:var(--code);border:1px solid var(--line);border-radius:6px;padding:12px;overflow:auto;font-size:13px}
+table{border-collapse:collapse;width:100%;font-size:14px} td,th{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+</style></head><body><main>
+<h1>postgres-ops-lab</h1>
+<p class="sub">PostgreSQL operations against a real primary and replica in Docker: replication, failover, point-in-time recovery, schema changes under load, query plans and bloat.</p>
+<p><a href="https://github.com/gerardrecinto/postgres-ops-lab">Source</a> · <a href="https://github.com/gerardrecinto/postgres-ops-lab/blob/main/docs/DEMO_OUTPUT.txt">Recorded output</a></p>
+<pre>./scripts/demo.sh</pre>
+<table>
+<tr><th>Scenario</th><th>Observed</th></tr>
+<tr><td>Replay paused, 5,000 rows written</td><td>Replica serves 1,000 rows, primary 1.68 MB ahead, catch-up 0.2 s</td></tr>
+<tr><td>ALTER TABLE behind a long reader</td><td>A plain INSERT waited 2.3 s. With lock_timeout it waited 0 s</td></tr>
+<tr><td>Cancelled CREATE INDEX CONCURRENTLY</td><td>INVALID index left behind until dropped</td></tr>
+<tr><td>Stale statistics</td><td>Estimated 15,002 rows, actual 604,042</td></tr>
+<tr><td>Open transaction during updates</td><td>VACUUM removed 0 of 300,000 dead tuples</td></tr>
+<tr><td>Stopped replica with a slot</td><td>Primary kept 63.9 MB of WAL</td></tr>
+<tr><td>DELETE FROM orders, restore to the second before</td><td>0 rows, then 1,500 rows back</td></tr>
+</table>
+<p>Replication is asynchronous, failover is manual, and the RDS module is validated but never applied. The README lists the trade-offs and what is not covered.</p>
+</main></body></html>

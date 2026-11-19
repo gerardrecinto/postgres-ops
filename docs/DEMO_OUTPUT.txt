@@ -1,0 +1,71 @@
+## replication basic
+replica_rows: 1000
+converged: True
+replica_in_recovery: True
+replica_write_error: ReadOnlySqlTransaction
+
+## replication lag and stale read
+primary_rows: 6000
+replica_rows_while_paused: 1000
+lag_bytes_while_paused: 1678952
+caught_up: True
+catch_up_seconds: 0.21
+
+## migration naive ALTER
+alter_seconds: 3.0
+insert_seconds: 2.28
+
+## migration ALTER with lock_timeout
+first_try: lock_timeout
+first_try_seconds: 0.3
+insert_seconds: 0.0
+retry: ok
+
+## migration batched backfill
+batches: 7
+unfilled: 0
+seconds: 0.82
+
+## migration concurrent index
+cancelled: True
+index_left_behind_after_cancel: True
+indisvalid_after_cancel: False
+indisvalid_after_retry: True
+
+## migration NOT VALID constraint
+validated_on_add: False
+validated_after: True
+
+plans before_analyze_rare_customer: {"node": "Seq Scan", "ms": 40.03, "est_rows": 4179, "actual_rows": 24}
+plans rare_customer_with_index: {"node": "Index Scan", "ms": 0.05, "est_rows": 43, "actual_rows": 24}
+plans hot_customer_with_index: {"node": "Seq Scan", "ms": 56.25, "est_rows": 897767, "actual_rows": 899876}
+plans index_bytes: {"full_status_index": 6955008, "partial_pending_index": 245760}
+plans pending_count_with_partial: {"node": "Index Only Scan", "ms": 3.14, "est_rows": 9033, "actual_rows": 10027}
+plans stale_stats_pending_count: {"node": "Index Only Scan", "ms": 171.79, "est_rows": 15002, "actual_rows": 604042}
+plans after_analyze_pending_count: {"node": "Index Only Scan", "ms": 68.28, "est_rows": 603133, "actual_rows": 604042}
+
+## bloat
+fresh: {"dead_tuples": 0, "table_mb": 13}
+after_3_updates: {"dead_tuples": 300000, "table_mb": 53}
+vacuum_while_txn_open: {"dead_tuples": 300000, "table_mb": 53}
+vacuum_after_txn_closed: {"dead_tuples": 0, "table_mb": 53}
+after_vacuum_full: {"dead_tuples": 0, "table_mb": 13}
+vacuum_note: plain VACUUM frees space for reuse; only VACUUM FULL (ACCESS EXCLUSIVE) returns it to the OS
+
+## replication slot retention
+slot_active_while_replica_down: False
+retained_wal_bytes_while_down: 63917800
+retained_wal_bytes_before: 0
+retained_wal_bytes_after_catch_up: 0
+replica_restarted: True
+replica_caught_up: True
+
+## replication failover
+rows_before: 106000
+still_in_recovery: False
+rows_after_write: 106001
+
+## point-in-time recovery
+ROWS_AFTER_BAD_DELETE=0
+RECOVERY_TARGET=2026-11-19 23:42:14.694459 UTC
+RESTORED_ROWS=1500

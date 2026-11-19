@@ -1,0 +1,30 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  labs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: docker compose up -d --wait
+      - run: pytest -q
+  demo-output:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/demo.sh
+      - run: |
+          grep -q 'RESTORED_ROWS=1500' docs/DEMO_OUTPUT.txt
+          grep -q 'first_try: lock_timeout' docs/DEMO_OUTPUT.txt
+  validate-rds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=infra/rds init -backend=false && terraform -chdir=infra/rds validate
