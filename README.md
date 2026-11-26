@@ -48,9 +48,4 @@ Numbers come from one laptop and are not benchmarks. Full output in [docs/DEMO_O
 
 [`infra/rds/main.tf`](infra/rds/main.tf): Multi-AZ PostgreSQL 16, encrypted gp3, master password in Secrets Manager (`manage_master_user_password`), 14-day PITR window, parameter group that logs slow statements and lock waits and forces TLS, read replicas, and alarms for replica lag, free storage and transaction ID age. `terraform validate` passes. It has not been applied and no AWS resources were created.
 
-## Not covered
-
-- No connection pooler (PgBouncer), no partitioning, no logical replication or major-version upgrade.
-- No automatic failover. Promotion is a manual `pg_promote()`. The old primary would need `pg_rewind` or a rebuild to rejoin, which is not shown.
-- Replication here is asynchronous, so a failover at the wrong moment can lose the last writes. Synchronous replication is not tested.
-- Single machine, so no network latency between nodes. The RDS module is untested against a real account.
+Replication is asynchronous and promotion is a manual `pg_promote()`.
